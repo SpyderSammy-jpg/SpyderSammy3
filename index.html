@@ -1,0 +1,2682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SpyderSammy 3.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050505;
+      --bg-alt: #111111;
+      --red: #ff1744;
+      --yellow: #ffeb3b;
+      --white: #f5f5f5;
+      --muted: #888888;
+      --card: #151515;
+      --accent: #ff5252;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1a1a1a 0, #000 55%);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    /* Global header for all non-launcher pages */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .app-header-inner {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-main {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .brand-main span {
+      color: var(--red);
+    }
+
+    .brand-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+
+    .badge-30 {
+      transform: rotate(-18deg);
+      background: linear-gradient(135deg, var(--red), var(--yellow));
+      color: #000;
+      font-weight: 900;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      box-shadow: 0 0 18px rgba(255, 23, 68, 0.6);
+      animation: pulseZoom 2.4s ease-in-out infinite;
+    }
+
+    .current-page-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+    }
+
+    @keyframes pulseZoom {
+      0% {
+        transform: rotate(-18deg) scale(1);
+        box-shadow: 0 0 10px rgba(255, 23, 68, 0.4);
+      }
+      50% {
+        transform: rotate(-18deg) scale(1.12);
+        box-shadow: 0 0 26px rgba(255, 235, 59, 0.8);
+      }
+      100% {
+        transform: rotate(-18deg) scale(1);
+        box-shadow: 0 0 10px rgba(255, 23, 68, 0.4);
+      }
+    }
+
+    main {
+      padding-top: 80px;
+    }
+
+    .page {
+      display: none;
+      min-height: calc(100vh - 80px);
+      padding: 40px 20px 60px;
+    }
+
+    .page.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-inner {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Launcher */
+
+    #launcher {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .launcher-inner {
+      text-align: center;
+      max-width: 700px;
+    }
+
+    .launcher-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 40px;
+    }
+
+    .launcher-main {
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
+    }
+
+    .launcher-main span {
+      color: var(--red);
+    }
+
+    .launcher-sub {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      color: var(--muted);
+    }
+
+    .launcher-30 {
+      margin-top: 10px;
+      transform: rotate(-18deg);
+      background: linear-gradient(135deg, var(--red), var(--yellow));
+      color: #000;
+      font-weight: 900;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1rem;
+      box-shadow: 0 0 18px rgba(255, 23, 68, 0.6);
+      animation: pulseZoom 2.4s ease-in-out infinite;
+    }
+
+    .launcher-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 26px;
+    }
+
+    .primary-btn {
+      background: var(--yellow);
+      color: #000;
+      padding: 14px 26px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.8rem;
+      transition: all 0.18s ease-out;
+      box-shadow: 0 0 18px rgba(255, 235, 59, 0.4);
+      min-width: 260px;
+    }
+
+    .primary-btn:hover {
+      background: var(--white);
+      box-shadow: 0 0 24px rgba(255, 255, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .launcher-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .toggle-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .toggle-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: 0.2s;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 2px;
+      background-color: var(--yellow);
+      transition: 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 235, 59, 0.7);
+    }
+
+    input:checked + .slider {
+      background-color: var(--red);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: var(--white);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    }
+
+    .launcher-footer {
+      margin-top: 26px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    /* Home */
+
+    #home .page-inner {
+      text-align: center;
+    }
+
+    .home-title-block {
+      margin-bottom: 26px;
+    }
+
+    .home-title-main {
+      font-size: clamp(2.2rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .home-title-main span {
+      color: var(--red);
+    }
+
+    .home-title-sub {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+
+    .home-30 {
+      margin-top: 14px;
+      display: inline-block;
+      transform: rotate(-18deg);
+      background: linear-gradient(135deg, var(--red), var(--yellow));
+      color: #000;
+      font-weight: 900;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      box-shadow: 0 0 18px rgba(255, 23, 68, 0.6);
+      animation: pulseZoom 2.4s ease-in-out infinite;
+    }
+
+    .splash-text {
+      margin: 26px auto 18px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--yellow);
+      opacity: 0.9;
+    }
+
+    .search-wrapper {
+      max-width: 600px;
+      margin: 0 auto 26px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 46px 14px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--white);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 18px rgba(255, 235, 59, 0.4);
+      background: rgba(0, 0, 0, 0.9);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    .section-title {
+      margin: 26px 0 10px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-align: left;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .service-card {
+      position: relative;
+      background: radial-gradient(circle at top left, #222 0, #050505 55%);
+      border-radius: 16px;
+      padding: 16px 14px 18px;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: transform 0.16s ease-out, box-shadow 0.16s ease-out,
+        border 0.16s ease-out, background 0.16s ease-out;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(255, 23, 68, 0.18), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.16s ease-out;
+      pointer-events: none;
+    }
+
+    .service-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 22px rgba(0, 0, 0, 0.9);
+      border-color: rgba(255, 235, 59, 0.5);
+      background: radial-gradient(circle at top left, #262626 0, #050505 60%);
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: var(--white);
+    }
+
+    .service-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+      max-width: 260px;
+    }
+
+    .service-tag {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--yellow);
+    }
+
+    .pin-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+      z-index: 2;
+      cursor: pointer;
+      transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease,
+        border 0.16s ease;
+    }
+
+    .pin-btn:hover {
+      background: rgba(255, 235, 59, 0.12);
+      color: var(--yellow);
+      transform: translateY(-1px);
+      border-color: rgba(255, 235, 59, 0.6);
+    }
+
+    .pin-btn.pinned {
+      background: var(--yellow);
+      color: #000;
+      border-color: var(--yellow);
+      box-shadow: 0 0 12px rgba(255, 235, 59, 0.7);
+    }
+
+    .pin-btn.pinned:hover {
+      background: var(--white);
+      border-color: var(--white);
+    }
+
+    .pinned-section {
+      margin-top: 26px;
+      display: none;
+    }
+
+    .pinned-section.visible {
+      display: block;
+    }
+
+    .no-results {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Calculator page */
+
+    .tool-shell {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      background: radial-gradient(circle at top, #1b1b1b 0, #050505 60%);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 24px 20px 26px;
+      box-shadow: 0 0 26px rgba(0, 0, 0, 0.9);
+    }
+
+    .tool-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      margin-bottom: 6px;
+    }
+
+    .tool-subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .calc-display {
+      background: #000;
+      border-radius: 16px;
+      padding: 16px 18px;
+      text-align: right;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      margin-bottom: 16px;
+      min-height: 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .calc-expression {
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 18px;
+      word-wrap: break-word;
+    }
+
+    .calc-result {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--yellow);
+      word-wrap: break-word;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .calc-btn {
+      padding: 14px 0;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      background: #151515;
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: background 0.12s ease, transform 0.12s ease,
+        box-shadow 0.12s ease, border 0.12s ease;
+    }
+
+    .calc-btn:hover {
+      background: #202020;
+      transform: translateY(-1px);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+    }
+
+    .calc-btn.op {
+      color: var(--yellow);
+      border-color: rgba(255, 235, 59, 0.4);
+    }
+
+    .calc-btn.eq {
+      background: linear-gradient(135deg, var(--red), var(--yellow));
+      color: #000;
+      border-color: transparent;
+      box-shadow: 0 0 16px rgba(255, 23, 68, 0.7);
+    }
+
+    .calc-btn.eq:hover {
+      box-shadow: 0 0 20px rgba(255, 235, 59, 0.9);
+    }
+
+    .calc-btn.wide {
+      grid-column: span 2;
+    }
+
+    /* Notes page */
+
+    .notes-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .notes-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .editor-shell {
+      background: #050505;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px;
+      background: #111;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .toolbar-btn,
+    .toolbar-select,
+    .toolbar-color {
+      background: #151515;
+      color: var(--white);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      cursor: pointer;
+      min-width: 32px;
+      text-align: center;
+      transition: background 0.12s ease, border 0.12s ease, transform 0.12s ease;
+    }
+
+    .toolbar-btn:hover,
+    .toolbar-select:hover {
+      background: #222;
+      border-color: rgba(255, 235, 59, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .toolbar-select {
+      padding-right: 24px;
+    }
+
+    .toolbar-color {
+      padding: 0;
+      width: 32px;
+      height: 26px;
+      overflow: hidden;
+    }
+
+    .toolbar-color input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .editor-area {
+      flex: 1;
+      padding: 14px 16px;
+      background: #050505;
+      color: var(--white);
+      text-align: left;
+      overflow-y: auto;
+    }
+
+    .editor-area[contenteditable="true"]:empty:before {
+      content: "Start typing your note...";
+      color: var(--muted);
+    }
+
+    .editor-footer {
+      padding: 10px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .save-note-btn {
+      background: var(--yellow);
+      color: #000;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: none;
+      cursor: pointer;
+      transition: background 0.12s ease, transform 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+
+    .save-note-btn:hover {
+      background: var(--white);
+      transform: translateY(-1px);
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.6);
+    }
+
+    .notes-gallery-shell {
+      background: #050505;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 14px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      max-height: 420px;
+    }
+
+    .notes-gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .notes-gallery-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .notes-gallery-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .gallery-btn {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #151515;
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease, border 0.12s ease;
+    }
+
+    .gallery-btn:hover {
+      background: #222;
+      color: var(--yellow);
+      border-color: rgba(255, 235, 59, 0.6);
+    }
+
+    .notes-list {
+      margin-top: 6px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .note-item {
+      border-radius: 12px;
+      padding: 8px 8px 8px 10px;
+      background: #111;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 8px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .note-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .note-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--white);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .note-meta {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .note-action-btn {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #151515;
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease, border 0.12s ease;
+    }
+
+    .note-action-btn:hover {
+      background: #222;
+      color: var(--yellow);
+      border-color: rgba(255, 235, 59, 0.6);
+    }
+
+    .note-pin {
+      font-size: 0.8rem;
+      padding: 3px 7px;
+    }
+
+    .note-pin.pinned {
+      background: var(--yellow);
+      color: #000;
+      border-color: var(--yellow);
+    }
+
+    /* Timer */
+
+    .timer-shell,
+    .stopwatch-shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .circle-timer {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--red) 0deg,
+        var(--yellow) 0deg,
+        #222 0deg
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 26px rgba(0, 0, 0, 0.9);
+    }
+
+    .circle-timer-inner {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .timer-display {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .timer-status {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+    }
+
+    .timer-inputs {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .timer-input {
+      width: 80px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: #050505;
+      color: var(--white);
+      text-align: center;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .timer-input::placeholder {
+      color: var(--muted);
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .timer-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: #151515;
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      transition: background 0.12s ease, border 0.12s ease, transform 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+
+    .timer-btn.primary {
+      background: var(--red);
+      border-color: var(--red);
+      color: #000;
+      box-shadow: 0 0 16px rgba(255, 23, 68, 0.7);
+    }
+
+    .timer-btn.primary:hover {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      box-shadow: 0 0 18px rgba(255, 235, 59, 0.9);
+    }
+
+    .timer-btn:hover {
+      background: #222;
+      border-color: rgba(255, 235, 59, 0.6);
+      transform: translateY(-1px);
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Stopwatch */
+
+    .stopwatch-display {
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .stopwatch-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stopwatch-laps {
+      margin-top: 14px;
+      max-height: 180px;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 420px;
+      text-align: left;
+    }
+
+    .lap-item {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #111;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+    }
+
+    /* SpyderPC */
+
+    .pc-shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .pc-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pc-message {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--yellow);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.12);
+      border-top-color: var(--red);
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .pc-iframe {
+      width: 100%;
+      max-width: 900px;
+      height: 520px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      overflow: hidden;
+      box-shadow: 0 0 26px rgba(0, 0, 0, 0.9);
+    }
+
+    .pc-iframe iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Utility */
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .launcher-buttons .primary-btn {
+        width: 100%;
+      }
+      .app-header-inner {
+        padding: 0 12px;
+      }
+      .brand-main {
+        font-size: 1.2rem;
+      }
+      .badge-30 {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Launcher -->
+  <section id="launcher">
+    <div class="launcher-inner">
+      <div class="launcher-title">
+        <div class="launcher-main">
+          <span>Spyder</span>Sammy
+        </div>
+        <div class="launcher-sub">Tools for the stealthy power user</div>
+        <div class="launcher-30">3.0</div>
+      </div>
+
+      <div class="launcher-buttons">
+        <button id="btn-open-aboutblank" class="primary-btn">
+          Open in about:blank
+        </button>
+        <button id="btn-continue-here" class="primary-btn">
+          Continue without cloak
+        </button>
+      </div>
+
+      <div class="launcher-note">
+        Choose how you want to launch SpyderSammy 3.0. Cloak mode uses an
+        about:blank tab.
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Always open in about:blank</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-auto-aboutblank" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="launcher-footer">
+        Built for the community • Red, black, white &amp; yellow ops
+      </div>
+    </div>
+  </section>
+
+  <!-- App header (for home + tools) -->
+  <header class="app-header hidden" id="app-header">
+    <div class="app-header-inner">
+      <div class="brand">
+        <div>
+          <div class="brand-main">
+            <span>Spyder</span>Sammy
+          </div>
+          <div class="brand-tag">Tools • 3.0</div>
+        </div>
+        <div class="badge-30">3.0</div>
+      </div>
+      <div class="current-page-label" id="current-page-label">Home</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Home -->
+    <section id="home" class="page">
+      <div class="page-inner">
+        <div class="home-title-block">
+          <div class="home-title-main">
+            <span>Spyder</span>Sammy Services
+          </div>
+          <div class="home-title-sub">
+            With over 30+ stealthy utilities at your fingertips
+          </div>
+          <div class="home-30">3.0</div>
+        </div>
+
+        <div class="splash-text" id="splash-text">
+          With over 30+ services.
+        </div>
+
+        <div class="search-wrapper">
+          <input
+            id="service-search"
+            class="search-input"
+            type="text"
+            placeholder="Search SpyderSammy Services"
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+
+        <div id="pinned-section" class="pinned-section">
+          <div class="section-title">Pinned services</div>
+          <div class="services-grid" id="pinned-services-grid"></div>
+        </div>
+
+        <div class="section-title">All services</div>
+        <div class="services-grid" id="services-grid">
+          <!-- 1. SpyderCalculator -->
+          <div
+            class="service-card"
+            data-service="SpyderCalculator"
+            data-description="Advanced, blazing-fast calculator for instant answers and clean math workflows."
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderCalculator"
+              title="Pin SpyderCalculator"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderCalculator</div>
+            <div class="service-desc">
+              Crunch numbers with a full-screen, precision calculator built for speed and clarity.
+            </div>
+            <div class="service-tag">Math • Advanced</div>
+          </div>
+
+          <!-- 2. SpyderNotes -->
+          <div
+            class="service-card"
+            data-service="SpyderNotes"
+            data-description="Rich notepad with formatting, colors, and a gallery to store every idea."
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderNotes"
+              title="Pin SpyderNotes"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderNotes</div>
+            <div class="service-desc">
+              Capture, style, and organize your notes with a powerful editor and note gallery.
+            </div>
+            <div class="service-tag">Writing • Notes</div>
+          </div>
+
+          <!-- 3. SpyderTimer -->
+          <div
+            class="service-card"
+            data-service="SpyderTimer"
+            data-description="Visual countdown timer with a dynamic ring and precise time control."
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderTimer"
+              title="Pin SpyderTimer"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderTimer</div>
+            <div class="service-desc">
+              Set focused countdowns with a bold circular timer and clear status feedback.
+            </div>
+            <div class="service-tag">Time • Countdown</div>
+          </div>
+
+          <!-- 4. SpyderStopwatch -->
+          <div
+            class="service-card"
+            data-service="SpyderStopwatch"
+            data-description="Accurate stopwatch with lap tracking for timing anything perfectly."
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderStopwatch"
+              title="Pin SpyderStopwatch"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderStopwatch</div>
+            <div class="service-desc">
+              Track elapsed time and laps with a clean, high-contrast stopwatch interface.
+            </div>
+            <div class="service-tag">Time • Stopwatch</div>
+          </div>
+
+          <!-- 5. SpyderPC -->
+          <div
+            class="service-card"
+            data-service="SpyderPC"
+            data-description="Launch a virtual Windows 11 desktop inside SpyderSammy."
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderPC"
+              title="Pin SpyderPC"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderPC</div>
+            <div class="service-desc">
+              Boot into a Windows 11-style PC experience seamlessly inside a secure frame.
+            </div>
+            <div class="service-tag">System • Virtual PC</div>
+          </div>
+
+          <!-- 6-30 placeholders (blank for now) -->
+          <div
+            class="service-card"
+            data-service="SpyderCalendar"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderCalendar"
+              title="Pin SpyderCalendar"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderCalendar</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderProxy"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderProxy"
+              title="Pin SpyderProxy"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderProxy</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderAI"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderAI"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderAI</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderRoblox"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderRoblox"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderRoblox</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderChat"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderChat"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderChat</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderMovies"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderMovies"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderMovies</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderBookmarklets"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderBookmarklets"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderBookmarklets</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderBlock"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderBlock"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderBlock</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderMeet"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderMeet"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderMeet</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderClock"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderClock"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderClock</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderProxies"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderProxies"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderProxies</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderMusic"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderMusic"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderMusic</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderYoutube"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderYoutube"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderYoutube</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderScreenshots"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderScreenshots"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderScreenshots</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderCamera"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderCamera"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderCamera</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderApps"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderApps"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderApps</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderEaglercraft2"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderEaglercraft2"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderEaglercraft2</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderWorldClock"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderWorldClock"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderWorldClock</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderWhiteboard"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderWhiteboard"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderWhiteboard</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderPageMarker"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderPageMarker"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderPageMarker</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderFormulas"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderFormulas"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderFormulas</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderUnblocker"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderUnblocker"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderUnblocker</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderDevTools"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderDevTools"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderDevTools</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+
+          <div
+            class="service-card"
+            data-service="SpyderVideos"
+            data-description=""
+          >
+            <button
+              class="pin-btn"
+              type="button"
+              data-pin="SpyderVideos"
+            >
+              📌
+            </button>
+            <div class="service-name">SpyderVideos</div>
+            <div class="service-desc"></div>
+            <div class="service-tag"></div>
+          </div>
+        </div>
+
+        <div id="no-results" class="no-results hidden">
+          No services match your search. Try a different keyword.
+        </div>
+      </div>
+    </section>
+
+    <!-- SpyderCalculator page -->
+    <section id="SpyderCalculator" class="page">
+      <div class="page-inner">
+        <div class="tool-shell">
+          <div class="tool-title">SpyderCalculator</div>
+          <div class="tool-subtitle">
+            Full-screen advanced calculator with instant evaluation and a bold red-yellow theme.
+          </div>
+
+          <div class="calc-display">
+            <div id="calc-expression" class="calc-expression"></div>
+            <div id="calc-result" class="calc-result">0</div>
+          </div>
+
+          <div class="calc-grid">
+            <button class="calc-btn op" data-action="clear">AC</button>
+            <button class="calc-btn op" data-action="back">⌫</button>
+            <button class="calc-btn op" data-value="(">(</button>
+            <button class="calc-btn op" data-value=")">)</button>
+
+            <button class="calc-btn" data-value="7">7</button>
+            <button class="calc-btn" data-value="8">8</button>
+            <button class="calc-btn" data-value="9">9</button>
+            <button class="calc-btn op" data-value="/">÷</button>
+
+            <button class="calc-btn" data-value="4">4</button>
+            <button class="calc-btn" data-value="5">5</button>
+            <button class="calc-btn" data-value="6">6</button>
+            <button class="calc-btn op" data-value="*">×</button>
+
+            <button class="calc-btn" data-value="1">1</button>
+            <button class="calc-btn" data-value="2">2</button>
+            <button class="calc-btn" data-value="3">3</button>
+            <button class="calc-btn op" data-value="-">−</button>
+
+            <button class="calc-btn" data-value="0">0</button>
+            <button class="calc-btn" data-value=".">.</button>
+            <button class="calc-btn op" data-value="+">+</button>
+            <button class="calc-btn eq" data-action="equals">=</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SpyderNotes page -->
+    <section id="SpyderNotes" class="page">
+      <div class="page-inner">
+        <div class="tool-shell">
+          <div class="tool-title">SpyderNotes</div>
+          <div class="tool-subtitle">
+            A powerful notepad with formatting, colors, and a NoteGallery to store everything.
+          </div>
+
+          <div class="notes-layout">
+            <div class="editor-shell">
+              <div class="editor-toolbar">
+                <button
+                  class="toolbar-btn"
+                  type="button"
+                  data-cmd="bold"
+                >
+                  B
+                </button>
+                <button
+                  class="toolbar-btn"
+                  type="button"
+                  data-cmd="italic"
+                >
+                  I
+                </button>
+                <button
+                  class="toolbar-btn"
+                  type="button"
+                  data-cmd="underline"
+                >
+                  U
+                </button>
+                <button
+                  class="toolbar-btn"
+                  type="button"
+                  data-cmd="strikeThrough"
+                >
+                  S
+                </button>
+
+                <select
+                  class="toolbar-select"
+                  id="font-size-select"
+                  title="Font size"
+                >
+                  <option value="">Size</option>
+                  <option value="2">Small</option>
+                  <option value="3">Normal</option>
+                  <option value="4">Large</option>
+                  <option value="5">XL</option>
+                </select>
+
+                <select
+                  class="toolbar-select"
+                  id="font-family-select"
+                  title="Font family"
+                >
+                  <option value="">Font</option>
+                  <option value="system-ui">System</option>
+                  <option value="monospace">Mono</option>
+                  <option value="serif">Serif</option>
+                  <option value="sans-serif">Sans</option>
+                </select>
+
+                <div class="toolbar-color" title="Text color">
+                  <input type="color" id="font-color-input" value="#ffeb3b" />
+                </div>
+                <div class="toolbar-color" title="Highlight">
+                  <input type="color" id="highlight-color-input" value="#ff1744" />
+                </div>
+              </div>
+
+              <div
+                id="notes-editor"
+                class="editor-area"
+                contenteditable="true"
+              ></div>
+
+              <div class="editor-footer">
+                <span>NoteGallery is at the bottom right of this page.</span>
+                <button id="save-note-btn" class="save-note-btn" type="button">
+                  Save note
+                </button>
+              </div>
+            </div>
+
+            <div class="notes-gallery-shell">
+              <div class="notes-gallery-header">
+                <div class="notes-gallery-title">NoteGallery</div>
+                <div class="notes-gallery-actions">
+                  <button
+                    id="clear-notes-btn"
+                    class="gallery-btn"
+                    type="button"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              </div>
+              <div id="notes-list" class="notes-list">
+                <!-- Notes injected here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SpyderTimer page -->
+    <section id="SpyderTimer" class="page">
+      <div class="page-inner">
+        <div class="tool-shell">
+          <div class="tool-title">SpyderTimer</div>
+          <div class="tool-subtitle">
+            A bold circular countdown timer with precise control and clear status.
+          </div>
+
+          <div class="timer-shell">
+            <div
+              class="circle-timer"
+              id="timer-circle"
+              data-progress="0"
+            >
+              <div class="circle-timer-inner">
+                <div id="timer-display" class="timer-display">00:00</div>
+                <div id="timer-status" class="timer-status">Ready</div>
+              </div>
+            </div>
+
+            <div class="timer-inputs">
+              <input
+                id="timer-minutes"
+                class="timer-input"
+                type="number"
+                min="0"
+                placeholder="Minutes"
+              />
+              <input
+                id="timer-seconds"
+                class="timer-input"
+                type="number"
+                min="0"
+                max="59"
+                placeholder="Seconds"
+              />
+            </div>
+
+            <div class="timer-controls">
+              <button
+                id="timer-start"
+                class="timer-btn primary"
+                type="button"
+              >
+                Start
+              </button>
+              <button
+                id="timer-pause"
+                class="timer-btn"
+                type="button"
+              >
+                Pause
+              </button>
+              <button
+                id="timer-reset"
+                class="timer-btn"
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SpyderStopwatch page -->
+    <section id="SpyderStopwatch" class="page">
+      <div class="page-inner">
+        <div class="tool-shell">
+          <div class="tool-title">SpyderStopwatch</div>
+          <div class="tool-subtitle">
+            High-contrast stopwatch with lap tracking for precise timing.
+          </div>
+
+          <div class="stopwatch-shell">
+            <div class="circle-timer">
+              <div class="circle-timer-inner">
+                <div id="stopwatch-display" class="stopwatch-display">
+                  00:00.00
+                </div>
+                <div class="timer-status">Stopwatch</div>
+              </div>
+            </div>
+
+            <div class="stopwatch-controls">
+              <button
+                id="stopwatch-start"
+                class="timer-btn primary"
+                type="button"
+              >
+                Start
+              </button>
+              <button
+                id="stopwatch-lap"
+                class="timer-btn"
+                type="button"
+              >
+                Lap
+              </button>
+              <button
+                id="stopwatch-reset"
+                class="timer-btn"
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
+
+            <div id="stopwatch-laps" class="stopwatch-laps"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SpyderPC page -->
+    <section id="SpyderPC" class="page">
+      <div class="page-inner">
+        <div class="tool-shell">
+          <div class="tool-title">SpyderPC</div>
+          <div class="tool-subtitle">
+            A virtual Windows 11 PC experience embedded directly into SpyderSammy.
+          </div>
+
+          <div class="pc-shell">
+            <div id="pc-loading" class="pc-loading">
+              <div class="pc-message">Opening Windows 11 PC</div>
+              <div class="spinner"></div>
+            </div>
+            <div id="pc-frame" class="pc-iframe hidden">
+              <iframe
+                src="https://joemama980.github.io/apps/windows11/index.html"
+                title="SpyderPC Windows 11"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // --- Utility helpers ---
+    function $(selector) {
+      return document.querySelector(selector);
+    }
+    function $all(selector) {
+      return Array.from(document.querySelectorAll(selector));
+    }
+
+    // --- Launcher logic ---
+    const launcherSection = $("#launcher");
+    const appHeader = $("#app-header");
+    const homeSection = $("#home");
+    const pageSections = $all(".page");
+    const currentPageLabel = $("#current-page-label");
+
+    const btnOpenAboutBlank = $("#btn-open-aboutblank");
+    const btnContinueHere = $("#btn-continue-here");
+    const toggleAutoAboutBlank = $("#toggle-auto-aboutblank");
+
+    const AUTO_ABOUT_KEY = "spyder_auto_aboutblank";
+    const PINNED_KEY = "spyder_pinned_services";
+    const NOTES_KEY = "spyder_notes";
+
+    function setCurrentPageLabel(name) {
+      currentPageLabel.textContent = name;
+    }
+
+    function showPage(id) {
+      pageSections.forEach((p) => p.classList.remove("active"));
+      const page = document.getElementById(id);
+      if (page) {
+        page.classList.add("active");
+      }
+      if (id === "home") {
+        setCurrentPageLabel("Home");
+      } else {
+        setCurrentPageLabel(id);
+      }
+    }
+
+    function showAppShell() {
+      launcherSection.classList.add("hidden");
+      appHeader.classList.remove("hidden");
+      document.body.style.overflow = "auto";
+    }
+
+    function openHomeHere() {
+      showAppShell();
+      showPage("home");
+      history.replaceState({ page: "home" }, "", "/home");
+    }
+
+    function openInAboutBlank() {
+      const win = window.open("about:blank", "_blank");
+      if (!win) {
+        alert("Popup blocked. Allow popups for this site to use about:blank cloak.");
+        return;
+      }
+      win.document.write(
+        "<!DOCTYPE html><html><head><title>SpyderSammy 3.0</title></head><body><script>location.href='/home';<\/script></body></html>"
+      );
+      win.document.close();
+    }
+
+    // Auto about:blank toggle
+    function loadAutoAboutBlank() {
+      const val = localStorage.getItem(AUTO_ABOUT_KEY);
+      toggleAutoAboutBlank.checked = val === "true";
+    }
+
+    function saveAutoAboutBlank(value) {
+      localStorage.setItem(AUTO_ABOUT_KEY, value ? "true" : "false");
+    }
+
+    btnOpenAboutBlank.addEventListener("click", () => {
+      openInAboutBlank();
+    });
+
+    btnContinueHere.addEventListener("click", () => {
+      openHomeHere();
+    });
+
+    toggleAutoAboutBlank.addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      saveAutoAboutBlank(checked);
+      if (checked) {
+        openInAboutBlank();
+      }
+    });
+
+    // --- Splash text rotation ---
+    const splashTexts = [
+      "With over 30+ services.",
+      "For the Community.",
+      "Don’t forget to play admin abuse."
+    ];
+    let splashIndex = 0;
+    const splashEl = $("#splash-text");
+
+    function rotateSplash() {
+      splashIndex = (splashIndex + 1) % splashTexts.length;
+      splashEl.textContent = splashTexts[splashIndex];
+    }
+    setInterval(rotateSplash, 5000);
+
+    // --- Services search + pinning ---
+    const servicesGrid = $("#services-grid");
+    const pinnedSection = $("#pinned-section");
+    const pinnedGrid = $("#pinned-services-grid");
+    const searchInput = $("#service-search");
+    const noResultsEl = $("#no-results");
+
+    function getPinnedServices() {
+      try {
+        const raw = localStorage.getItem(PINNED_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch {
+        return [];
+      }
+    }
+
+    function savePinnedServices(list) {
+      localStorage.setItem(PINNED_KEY, JSON.stringify(list));
+    }
+
+    function updatePinnedUI() {
+      const pinned = getPinnedServices();
+      pinnedGrid.innerHTML = "";
+      const cards = $all(".service-card");
+      cards.forEach((card) => {
+        const name = card.dataset.service;
+        const pinBtn = card.querySelector(".pin-btn");
+        if (!pinBtn) return;
+        if (pinned.includes(name)) {
+          pinBtn.classList.add("pinned");
+        } else {
+          pinBtn.classList.remove("pinned");
+        }
+      });
+
+      if (pinned.length === 0) {
+        pinnedSection.classList.remove("visible");
+        return;
+      }
+
+      pinnedSection.classList.add("visible");
+      pinned.forEach((name) => {
+        const original = cards.find((c) => c.dataset.service === name);
+        if (!original) return;
+        const clone = original.cloneNode(true);
+        const pinBtn = clone.querySelector(".pin-btn");
+        if (pinBtn) {
+          pinBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            togglePin(name);
+          });
+        }
+        clone.addEventListener("click", () => {
+          openService(name);
+        });
+        pinnedGrid.appendChild(clone);
+      });
+    }
+
+    function togglePin(name) {
+      const pinned = getPinnedServices();
+      const idx = pinned.indexOf(name);
+      if (idx === -1) {
+        pinned.push(name);
+      } else {
+        pinned.splice(idx, 1);
+      }
+      savePinnedServices(pinned);
+      updatePinnedUI();
+    }
+
+    servicesGrid.addEventListener("click", (e) => {
+      const pinBtn = e.target.closest(".pin-btn");
+      if (pinBtn) {
+        e.stopPropagation();
+        const name = pinBtn.dataset.pin;
+        if (name) togglePin(name);
+        return;
+      }
+      const card = e.target.closest(".service-card");
+      if (!card) return;
+      const service = card.dataset.service;
+      if (service) {
+        openService(service);
+      }
+    });
+
+    function filterServices() {
+      const query = searchInput.value.trim().toLowerCase();
+      const cards = $all("#services-grid .service-card");
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const name = card.dataset.service || "";
+        const desc = card.dataset.description || "";
+        const text = (name + " " + desc).toLowerCase();
+        const match = text.includes(query);
+        card.style.display = match ? "" : "none";
+        if (match) visibleCount++;
+      });
+      if (visibleCount === 0) {
+        noResultsEl.classList.remove("hidden");
+      } else {
+        noResultsEl.classList.add("hidden");
+      }
+    }
+
+    searchInput.addEventListener("input", filterServices);
+
+    // --- Routing / navigation ---
+    function openService(name) {
+      showAppShell();
+      showPage(name);
+      history.pushState({ page: name }, "", "/" + name);
+      if (name === "SpyderPC") {
+        startSpyderPC();
+      }
+    }
+
+    window.addEventListener("popstate", (e) => {
+      const state = e.state;
+      if (state && state.page) {
+        showAppShell();
+        showPage(state.page);
+        if (state.page === "SpyderPC") {
+          startSpyderPC();
+        }
+      } else {
+        // default to home
+        showAppShell();
+        showPage("home");
+      }
+    });
+
+    // --- Calculator logic ---
+    const calcExpressionEl = $("#calc-expression");
+    const calcResultEl = $("#calc-result");
+    let calcExpression = "";
+
+    function updateCalcDisplay() {
+      calcExpressionEl.textContent = calcExpression;
+      if (!calcExpression) {
+        calcResultEl.textContent = "0";
+        return;
+      }
+      try {
+        // Basic safe eval: only numbers and operators
+        const safe = calcExpression.replace(/[^0-9+\-*/().]/g, "");
+        const result = Function("return " + safe)();
+        if (result !== undefined && !Number.isNaN(result)) {
+          calcResultEl.textContent = result;
+        } else {
+          calcResultEl.textContent = "Error";
+        }
+      } catch {
+        calcResultEl.textContent = "Error";
+      }
+    }
+
+    $all(".calc-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const action = btn.dataset.action;
+        const value = btn.dataset.value;
+        if (action === "clear") {
+          calcExpression = "";
+        } else if (action === "back") {
+          calcExpression = calcExpression.slice(0, -1);
+        } else if (action === "equals") {
+          try {
+            const safe = calcExpression.replace(/[^0-9+\-*/().]/g, "");
+            const result = Function("return " + safe)();
+            if (result !== undefined && !Number.isNaN(result)) {
+              calcExpression = String(result);
+            }
+          } catch {
+            // ignore
+          }
+        } else if (value) {
+          calcExpression += value;
+        }
+        updateCalcDisplay();
+      });
+    });
+
+    // --- Notes logic ---
+    const notesEditor = $("#notes-editor");
+    const saveNoteBtn = $("#save-note-btn");
+    const notesListEl = $("#notes-list");
+    const clearNotesBtn = $("#clear-notes-btn");
+    const fontSizeSelect = $("#font-size-select");
+    const fontFamilySelect = $("#font-family-select");
+    const fontColorInput = $("#font-color-input");
+    const highlightColorInput = $("#highlight-color-input");
+
+    function execCmd(cmd, value = null) {
+      document.execCommand(cmd, false, value);
+      notesEditor.focus();
+    }
+
+    $all(".toolbar-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cmd = btn.dataset.cmd;
+        if (!cmd) return;
+        execCmd(cmd);
+      });
+    });
+
+    fontSizeSelect.addEventListener("change", () => {
+      const val = fontSizeSelect.value;
+      if (val) execCmd("fontSize", val);
+      fontSizeSelect.value = "";
+    });
+
+    fontFamilySelect.addEventListener("change", () => {
+      const val = fontFamilySelect.value;
+      if (val) execCmd("fontName", val);
+      fontFamilySelect.value = "";
+    });
+
+    fontColorInput.addEventListener("input", () => {
+      execCmd("foreColor", fontColorInput.value);
+    });
+
+    highlightColorInput.addEventListener("input", () => {
+      execCmd("hiliteColor", highlightColorInput.value);
+    });
+
+    function getNotes() {
+      try {
+        const raw = localStorage.getItem(NOTES_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch {
+        return [];
+      }
+    }
+
+    function saveNotes(list) {
+      localStorage.setItem(NOTES_KEY, JSON.stringify(list));
+    }
+
+    function renderNotes() {
+      const notes = getNotes();
+      notesListEl.innerHTML = "";
+      if (notes.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "note-meta";
+        empty.textContent = "No notes yet. Save one to see it here.";
+        notesListEl.appendChild(empty);
+        return;
+      }
+      notes
+        .slice()
+        .sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return b.created - a.created;
+        })
+        .forEach((note) => {
+          const item = document.createElement("div");
+          item.className = "note-item";
+
+          const header = document.createElement("div");
+          header.className = "note-item-header";
+
+          const title = document.createElement("div");
+          title.className = "note-title";
+          title.textContent = note.title || "Untitled note";
+
+          const meta = document.createElement("div");
+          meta.className = "note-meta";
+          const date = new Date(note.created);
+          meta.textContent = date.toLocaleString();
+
+          header.appendChild(title);
+          header.appendChild(meta);
+
+          const actions = document.createElement("div");
+          actions.className = "note-actions";
+
+          const viewBtn = document.createElement("button");
+          viewBtn.className = "note-action-btn";
+          viewBtn.textContent = "View";
+          viewBtn.addEventListener("click", () => {
+            notesEditor.innerHTML = note.content;
+          });
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "note-action-btn";
+          editBtn.textContent = "Edit";
+          editBtn.addEventListener("click", () => {
+            notesEditor.innerHTML = note.content;
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "note-action-btn";
+          deleteBtn.textContent = "Delete";
+          deleteBtn.addEventListener("click", () => {
+            const updated = getNotes().filter((n) => n.id !== note.id);
+            saveNotes(updated);
+            renderNotes();
+          });
+
+          const pinBtn = document.createElement("button");
+          pinBtn.className = "note-action-btn note-pin";
+          pinBtn.textContent = "📌";
+          if (note.pinned) pinBtn.classList.add("pinned");
+          pinBtn.addEventListener("click", () => {
+            const updated = getNotes().map((n) =>
+              n.id === note.id ? { ...n, pinned: !n.pinned } : n
+            );
+            saveNotes(updated);
+            renderNotes();
+          });
+
+          actions.appendChild(viewBtn);
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+          actions.appendChild(pinBtn);
+
+          item.appendChild(header);
+          item.appendChild(actions);
+          notesListEl.appendChild(item);
+        });
+    }
+
+    saveNoteBtn.addEventListener("click", () => {
+      const html = notesEditor.innerHTML.trim();
+      if (!html) {
+        alert("Write something before saving.");
+        return;
+      }
+      const text = notesEditor.textContent.trim();
+      const title = text.split("\n")[0].slice(0, 40) || "Untitled note";
+      const notes = getNotes();
+      const note = {
+        id: Date.now(),
+        title,
+        content: html,
+        created: Date.now(),
+        pinned: false
+      };
+      notes.push(note);
+      saveNotes(notes);
+      renderNotes();
+    });
+
+    clearNotesBtn.addEventListener("click", () => {
+      if (!confirm("Clear all notes from NoteGallery?")) return;
+      saveNotes([]);
+      renderNotes();
+    });
+
+    // --- Timer logic ---
+    const timerCircle = $("#timer-circle");
+    const timerDisplay = $("#timer-display");
+    const timerStatus = $("#timer-status");
+    const timerMinutesInput = $("#timer-minutes");
+    const timerSecondsInput = $("#timer-seconds");
+    const timerStartBtn = $("#timer-start");
+    const timerPauseBtn = $("#timer-pause");
+    const timerResetBtn = $("#timer-reset");
+
+    let timerTotalMs = 0;
+    let timerRemainingMs = 0;
+    let timerInterval = null;
+    let timerRunning = false;
+
+    function formatTime(ms) {
+      const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+      const m = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const s = String(totalSeconds % 60).padStart(2, "0");
+      return m + ":" + s;
+    }
+
+    function updateTimerDisplay() {
+      timerDisplay.textContent = formatTime(timerRemainingMs);
+      const progress =
+        timerTotalMs > 0
+          ? 360 * (1 - timerRemainingMs / timerTotalMs)
+          : 0;
+      timerCircle.style.background = `conic-gradient(var(--red) 0deg, var(--yellow) ${progress}deg, #222 ${progress}deg)`;
+    }
+
+    function startTimer() {
+      if (timerRunning) return;
+      if (timerRemainingMs <= 0) {
+        const minutes = parseInt(timerMinutesInput.value || "0", 10);
+        const seconds = parseInt(timerSecondsInput.value || "0", 10);
+        const total = (minutes * 60 + seconds) * 1000;
+        if (!total) {
+          alert("Set a time before starting the timer.");
+          return;
+        }
+        timerTotalMs = total;
+        timerRemainingMs = total;
+      }
+      timerRunning = true;
+      timerStatus.textContent = "Running";
+      timerInterval = setInterval(() => {
+        timerRemainingMs -= 100;
+        if (timerRemainingMs <= 0) {
+          timerRemainingMs = 0;
+          updateTimerDisplay();
+          stopTimer();
+          timerStatus.textContent = "Done";
+          return;
+        }
+        updateTimerDisplay();
+      }, 100);
+    }
+
+    function stopTimer() {
+      timerRunning = false;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function pauseTimer() {
+      if (!timerRunning) return;
+      stopTimer();
+      timerStatus.textContent = "Paused";
+    }
+
+    function resetTimer() {
+      stopTimer();
+      timerTotalMs = 0;
+      timerRemainingMs = 0;
+      timerStatus.textContent = "Ready";
+      updateTimerDisplay();
+    }
+
+    timerStartBtn.addEventListener("click", startTimer);
+    timerPauseBtn.addEventListener("click", pauseTimer);
+    timerResetBtn.addEventListener("click", resetTimer);
+
+    // --- Stopwatch logic ---
+    const stopwatchDisplay = $("#stopwatch-display");
+    const stopwatchStartBtn = $("#stopwatch-start");
+    const stopwatchLapBtn = $("#stopwatch-lap");
+    const stopwatchResetBtn = $("#stopwatch-reset");
+    const stopwatchLapsEl = $("#stopwatch-laps");
+
+    let stopwatchRunning = false;
+    let stopwatchStartTime = 0;
+    let stopwatchElapsed = 0;
+    let stopwatchInterval = null;
+    let lapCount = 0;
+
+    function formatStopwatch(ms) {
+      const totalMs = Math.max(0, ms);
+      const totalSeconds = Math.floor(totalMs / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+      const centis = String(Math.floor((totalMs % 1000) / 10)).padStart(2, "0");
+      return `${minutes}:${seconds}.${centis}`;
+    }
+
+    function updateStopwatchDisplay() {
+      stopwatchDisplay.textContent = formatStopwatch(stopwatchElapsed);
+    }
+
+    function startStopwatch() {
+      if (stopwatchRunning) {
+        // pause
+        stopwatchRunning = false;
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+        stopwatchStartBtn.textContent = "Start";
+        return;
+      }
+      stopwatchRunning = true;
+      stopwatchStartTime = performance.now() - stopwatchElapsed;
+      stopwatchStartBtn.textContent = "Pause";
+      stopwatchInterval = setInterval(() => {
+        stopwatchElapsed = performance.now() - stopwatchStartTime;
+        updateStopwatchDisplay();
+      }, 50);
+    }
+
+    function resetStopwatch() {
+      stopwatchRunning = false;
+      if (stopwatchInterval) {
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+      }
+      stopwatchElapsed = 0;
+      lapCount = 0;
+      stopwatchStartBtn.textContent = "Start";
+      stopwatchLapsEl.innerHTML = "";
+      updateStopwatchDisplay();
+    }
+
+    function addLap() {
+      if (!stopwatchRunning && stopwatchElapsed === 0) return;
+      lapCount += 1;
+      const lap = document.createElement("div");
+      lap.className = "lap-item";
+      lap.innerHTML = `<span>Lap ${lapCount}</span><span>${formatStopwatch(
+        stopwatchElapsed
+      )}</span>`;
+      stopwatchLapsEl.prepend(lap);
+    }
+
+    stopwatchStartBtn.addEventListener("click", startStopwatch);
+    stopwatchResetBtn.addEventListener("click", resetStopwatch);
+    stopwatchLapBtn.addEventListener("click", addLap);
+
+    // --- SpyderPC logic ---
+    let pcStarted = false;
+    function startSpyderPC() {
+      if (pcStarted) return;
+      pcStarted = true;
+      const loading = $("#pc-loading");
+      const frame = $("#pc-frame");
+      setTimeout(() => {
+        loading.classList.add("hidden");
+        frame.classList.remove("hidden");
+      }, 1500);
+    }
+
+    // --- Initial load logic ---
+    function initFromPath() {
+      const path = window.location.pathname;
+      if (path === "/" || path === "") {
+        // launcher first
+        return;
+      }
+      if (path === "/home") {
+        showAppShell();
+        showPage("home");
+        return;
+      }
+      const id = path.replace("/", "");
+      const page = document.getElementById(id);
+      if (page) {
+        showAppShell();
+        showPage(id);
+        if (id === "SpyderPC") startSpyderPC();
+      } else {
+        showAppShell();
+        showPage("home");
+        history.replaceState({ page: "home" }, "", "/home");
+      }
+    }
+
+    // On load
+    window.addEventListener("load", () => {
+      loadAutoAboutBlank();
+      updatePinnedUI();
+      renderNotes();
+      updateTimerDisplay();
+      updateStopwatchDisplay();
+      initFromPath();
+
+      // If auto about:blank is enabled and we're on root, open automatically
+      if (
+        window.location.pathname === "/" &&
+        toggleAutoAboutBlank.checked
+      ) {
+        openInAboutBlank();
+      }
+    });
+  </script>
+</body>
+</html>
